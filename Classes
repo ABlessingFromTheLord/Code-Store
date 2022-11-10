@@ -1,3 +1,4 @@
+#Initialising
 class Person
 {
 	public:
@@ -24,3 +25,142 @@ print(p.address);
 print(p.age);
 print(person2string(p));
 print(person2string(Person("Joe", "wild west", 42)));
+
+
+
+#another example
+#normal
+class Country
+{
+	public:
+			var name;
+			var size;
+			var capital_city;
+			
+	constructor(the_name, the_size, the_capital_city)
+	{
+			name = the_name;
+			size = the_size;
+			capital_city = the_capital_city;
+			
+	}
+
+
+}
+
+var c = Country("Germany", "357sq km", "Berlin");
+print(c.name);
+print(c.size);
+print(c.capital_city);
+
+
+
+#using getters and setters
+class Country
+{
+	private:
+			var name;
+			var size;
+			var capital_city;
+			
+	public:
+	constructor(the_name, the_size, the_capital_city)
+	{
+			name = the_name;
+			size = the_size;
+			capital_city = the_capital_city;
+			
+	}
+		
+		
+	#getters 
+	function getName()
+	{
+		return name;
+	}
+	
+	function getSize()
+	{
+		return size;
+	}
+	
+	function getCapitalCity()
+	{
+		return capital_city;
+	}
+	
+	#setters
+		function setName(new_name)
+	{
+		name = new_name;
+		return name;
+	}
+	
+	function setSize(new_size)
+	{
+		size = new_size;
+		return size;
+	}
+	
+	function setCapitalCity(new_city)
+	{
+		capital_city = new_city;
+		return capital_city;
+	}
+	
+}
+
+
+var c = Country("Germany", "357sq km", "Berlin");
+print(c.getName());
+print(c.getSize());
+print(c.getCapitalCity());
+
+
+
+#abstract data type
+class Rational
+{
+public:
+		var numerator;
+		var denominator;
+		
+	constructor(the_numerator, the_denominator)
+	{
+			numerator = the_numerator;
+			denominator = the_denominator;
+	}
+}
+
+function real(x)
+{
+}
+
+function add(x, y)
+{
+}
+
+function subtract(x, y)
+{
+}
+
+function multiply(x, y)
+{
+}
+
+function divide(x, y)
+{
+}
+
+function equal(x, y)
+{
+}
+
+function less(x, y)
+{
+}
+
+
+
+#inheritance
+
