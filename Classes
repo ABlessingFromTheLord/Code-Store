@@ -1,0 +1,26 @@
+class Person
+{
+	public:
+			var name;
+			var address; 
+			var age;
+			
+		constructor(m_name, m_address, m_age)
+		{
+			name = m_name;
+			address = m_address;
+			age = m_age;
+		}
+}
+		
+		function person2string(p){
+			return p.name + " (" + p.age + "), " + "wohnhaft: " + p.address;  
+		}
+
+
+var p = Person("Joe", "wild west", 42);
+print(p.name);
+print(p.address);
+print(p.age);
+print(person2string(p));
+print(person2string(Person("Joe", "wild west", 42)));
