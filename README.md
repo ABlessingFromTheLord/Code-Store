@@ -1,2 +1,2 @@
 # Code-Store
-#This is a collection of my Tscript code for various purposes
+#This is a collection of my code for various purposes
