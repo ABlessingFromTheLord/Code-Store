@@ -1,10 +1,10 @@
 public class Room {
     private String roomName;
-    private boolean lighting = false;
+    private boolean lighting;
 
-    public Room(String the_roomName, boolean the_light){
+    public Room(String the_roomName){
         roomName = the_roomName;
-        lighting = the_light;
+        lighting = false;
     }
 
     //functions
@@ -13,8 +13,17 @@ public class Room {
     }
 
     public void switchLight(){
-        lighting = true;
-        System.out.println("Switched on the light");
+        lighting = !(lighting);
+        if(lighting == true){
+            System.out.println("Switched on the light");
+        }
+        else{
+            System.out.println("Switched off the light");
+        }
+    }
+
+    public String getRoomName() {
+        return roomName;
     }
 
 }
