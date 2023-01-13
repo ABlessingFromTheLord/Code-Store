@@ -11,16 +11,19 @@ def leftrotation(v, n):
 
     while n > 0:
         #rotation algorithm using a temporary array
-        tempArray = binary[:]
-        i = 0
+        tempArray = []
+        i = 1
 
-        while i < len(tempArray)-1:
-            tempArray[i] = binary[i+1]
+        while i < len(binary):
+            tempArray.append(binary[i])
             i += 1
-        tempArray[4] = binary[0]
+        tempArray.append(binary[0])
+
+        binary = tempArray[:]
+        tempArray.clear()
 
         n -= 1
 
-    return tempArray
+    return binary
 
-print(leftrotation(24, 2))
+print(leftrotation(24, 5))
