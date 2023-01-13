@@ -9,8 +9,8 @@ def leftrotation(v, n):
         v //= 2
     binary.reverse()
 
+    # rotation algorithm using a temporary array
     while n > 0:
-        #rotation algorithm using a temporary array
         tempArray = []
         i = 1
 
@@ -24,6 +24,11 @@ def leftrotation(v, n):
 
         n -= 1
 
-    return binary
+    #recreating a decimal from a binary array
+    v = 0
+    exp = len(binary)-1
+    for i in range (0, len(binary)):
+        v += binary[i] * (2**exp)
+        exp -= 1
 
-print(leftrotation(24, 5))
+    return v
