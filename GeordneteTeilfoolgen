@@ -1,0 +1,61 @@
+function ordered(a)
+{
+	if a.size() == 0 then return a;
+	
+	else
+	{
+		var arrOrder = ["red","orange","brown","white", "green", "cyan", "yellow", "blue", "black", "pink"];
+
+		# check edge cases
+		try
+		{
+			for var i in 0:a.size() do 
+			{ 
+				if Type(a) != Array then throw "1";
+				else if Type(a[i]) != String then throw "2";
+				else 
+				{
+					var contained = 0;
+
+					for var j in 0:arrOrder.size() do
+					{	
+						if arrOrder[j] == a[i] then 
+						{
+							contained += 1;		
+						}
+					}
+
+					if contained == 0 then throw "3";
+				}	
+			}
+
+
+			for var k in 0:arrOrder.size() do
+			{
+				var contained = 0;
+
+				for var j in 0:a.size() do
+				{
+					if arrOrder[k] ==a[j] then contained += 1; 
+				}
+
+				if contained > 1 then throw "4";
+			}
+		}
+
+		catch var ex do 
+		{
+			if ex == "1" then print(a + " is not an array");
+			if ex == "2" then print("One of the entries is not a String");
+			if ex == "3" then print("one of the strings is not a valid entry");
+			if ex == "4" then print("An entry is contained multiple times");
+		}
+		
+		# continue with the task preliquisite
+		
+		
+	}
+	
+}
+
+print(ordered([]));
