@@ -1,0 +1,60 @@
+class Entry
+{
+public:
+	# do not change this class
+	constructor(b, e)
+	{
+		if b >= e then throw "calendar entries must have a positive duration";
+		begin = b;
+		end = e;
+	}
+	var begin, end;
+}
+
+	var temp = [];
+
+function arrange(entries)
+{
+	var result = [];
+	var min = entries[0].begin;
+	var max = entries[0].end;
+	var minIndex = 0;
+	var maxIndex = 0;
+	var i = 0;
+	
+	while(i < entries.size()) do{
+		if (entries[i].begin < min) then {
+			min = entries[i].begin;
+			minIndex = i;
+		}
+		if (entries[i].end > max) then {
+			max = entries[i].end;
+			maxIndex = i;
+		}
+		i += 1;
+	} 
+	
+	var difference = entries[maxIndex].end - entries[minIndex].begin;
+	
+	# creating column
+	var column = Entry(entries[minIndex].begin, entries[maxIndex].end);
+	
+	for var i in 0:entries.size() do{
+		
+		
+	
+	}
+
+	 temp.push(entries[minIndex]); 
+	 temp.push(entries[maxIndex]);
+	 entries.remove(minIndex);
+	 temp.push(difference);
+	 temp.push(entries.size());
+	 return temp;
+}
+
+print(arrange([Entry(13, 15), Entry(11, 18), Entry(10, 12)]));
+print(temp[0].begin);
+print(temp[0].end);
+print(temp[1].begin);
+print(temp[1].end);
