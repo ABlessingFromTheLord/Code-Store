@@ -16,6 +16,12 @@ public:
 function arrange(entries)
 {
 	var result = [];
+	
+	# filling result with dummy values
+	for var i in 0:entries.size() do{
+		entries[i] = 0;
+	}
+	
 	var min = entries[0].begin;
 	var max = entries[0].end;
 	var minIndex = 0;
@@ -38,23 +44,31 @@ function arrange(entries)
 	
 	# creating column
 	var column = Entry(entries[minIndex].begin, entries[maxIndex].end);
+	var columnSize = difference;
+	var columnCount = 0;
+	
+	# adding the smallest
+	result[minIndex] = 0;
+	difference -= (entries[minIndex].end - entries[minIndex].begin);
 	
 	for var i in 0:entries.size() do{
+		if (difference <= entries[i].end - entries[i].begin) then{
 		
+			difference -= entries[i].end - entries[i].begin;
+			result[i] = columnCount;
+		}
+		else{
+			columnCount += 1;
+			difference = entries[maxIndex].end - entries[minIndex].begin;
+			difference -= entries[i].end - entries[i].begin;
+			result[i] = columnCount;	
+		}
 		
 	
 	}
 
-	 temp.push(entries[minIndex]); 
-	 temp.push(entries[maxIndex]);
-	 entries.remove(minIndex);
-	 temp.push(difference);
-	 temp.push(entries.size());
-	 return temp;
+	 return result;
 }
 
 print(arrange([Entry(13, 15), Entry(11, 18), Entry(10, 12)]));
-print(temp[0].begin);
-print(temp[0].end);
-print(temp[1].begin);
-print(temp[1].end);
+
