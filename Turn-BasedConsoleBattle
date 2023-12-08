@@ -1,23 +1,51 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player{
     private int healthPoints = 10;
+    private bool defended = false;
+    private bool charge = false;
 
     //Getter and Setter
     public int getHealthPoints(){
         return this.healthPoints;
     }
 
+    public bool getDefence(){
+        return this.defended;
+    }
+
+    public bool getCharge(){
+        return this.charge;
+    }
+
     public void setHealthPoints(int value){
         this.healthPoints += value;
         if(this.getHealthPoints() < 0) this.healthPoints = 0;
+        if(this.getHealthPoints() >= 10) this.healthPoints = 10;
     }
+
 
     //Methods
     public void attacked(int value){
         this.healthPoints += value;
+        if(this.getHealthPoints() < 0) this.healthPoints = 0;
+    }
+
+    public void defend(bool def){
+        this.defended = def;
+    }
+
+    public void charged(bool chrg){
+        this.charge = chrg;
+    }
+
+    public void recreate(){
+        this.setHealthPoints(10);
+        this.defended = false;
+        this.charge = false;
     }
 
 }
@@ -27,144 +55,209 @@ public class Battle : MonoBehaviour
 {
     //Initial values of the booleans
     bool isPlayerTurn = true;
-    bool charged = false;
-    bool defendedHuman = false;
+    bool outPlay = true;
+    bool isRoutine = false;
     Player human;
     Player ai;
 
-    void reset (){
-        isPlayerTurn = true;
-        charged = false;
-        defendedHuman = false;
 
+    void reset (){
+        StopAllCoroutines();
+
+        human = new Player();
+        ai = new Player();
+
+        isPlayerTurn = true;
+        outPlay = true;
+        human.recreate();
+        ai.recreate();
+
+        Debug.Log("This game is a game played on the console, Press 1 to attack, 2 to heal and 3 to defend");
     }
 
 
     // Start is called before the first frame update
     void Start()
     {
-        human = new Player();
-        ai = new Player();
-
         reset();
-        Debug.Log("This game is a game played on the console");
-        //Getting user input
-        Debug.Log("Press 1 to attack, 2 to heal and 3 to defend");
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(human.getHealthPoints() > 0 && ai.getHealthPoints() > 0){
-            if(isPlayerTurn){
+        if (human.getHealthPoints() > 0 && ai.getHealthPoints() > 0)
+        {
+            if (isPlayerTurn)
+            {
 
                 //Attacking an opponent
-                if(Input.GetKeyDown(KeyCode.Keypad1)){
-                    int rnd = Random.Range(1, 3);
-                    ai.setHealthPoints(-rnd);
-                    Debug.Log("You have dealt enemy "+ rnd + " Damage, " + "Your Health: "+ human.getHealthPoints() + " " + "Opponent's Health: " + ai.getHealthPoints());
+                if (Input.GetKeyDown(KeyCode.Keypad1))
+                {
+                    //Attacking an enemy
+                    int rnd = Random.Range(2, 5);
+                    ai.attacked(-rnd);
+                    Debug.Log("You have dealt enemy " + rnd + " Damage, " + "Your Health: " + human.getHealthPoints() + " " + "Opponent's Health: " + ai.getHealthPoints());
                     isPlayerTurn = false;
                 }
-
-                //Healing yourself
-                if(Input.GetKeyDown(KeyCode.Keypad2)){
-                    if(human.getHealthPoints() == 10){
-                        Debug.Log("Maximum health healed, Your Health: "+ human.getHealthPoints() + " " + "Opponent's Health: " + ai.getHealthPoints());
-                        isPlayerTurn = false;
-                        }
-
-                    if(human.getHealthPoints() == 9){
-                        human.setHealthPoints(1);
-                        Debug.Log("Maximum health healed, Your Health: "+ human.getHealthPoints() + " " + "Opponent's Health: " + ai.getHealthPoints());
-                        isPlayerTurn = false;
-                        }
-
-                    if(human.getHealthPoints() <= 8){
-                        human.setHealthPoints(2);
-                        Debug.Log("Healed by 2 Health Points, Your Health: "+ human.getHealthPoints() + " " + "Opponent's Health: " + ai.getHealthPoints());
-                        isPlayerTurn = false;
-                    }
-                }
-
-                //Defending yourself
-                if(Input.GetKeyDown(KeyCode.Keypad3)){
-                    defendedHuman = true;
-                    isPlayerTurn = false;
-                }
-
             }
 
-            else if(!isPlayerTurn){
+            //Healing yourself
+            if (Input.GetKeyDown(KeyCode.Keypad2))
+            {
+                int healing = Random.Range(1, 5);
+                human.setHealthPoints(healing);
+                Debug.Log("Healed by," + healing + " Health Points, " + "Your Health: " + human.getHealthPoints() + " " + "Opponent's Health: " + ai.getHealthPoints());
+                isPlayerTurn = false;
+            }
+
+            //Defending yourself
+            if (Input.GetKeyDown(KeyCode.Keypad3))
+            {
+                human.defend(true);
+                isPlayerTurn = false;
+            }
+
+
+            else if (!isPlayerTurn)
+            {
                 //Its AIs turn to play
                 int action = Random.Range(1, 101);
 
                 //When charged
-                if(charged){
-                    if(defendedHuman){
+                if (ai.getCharge() == true)
+                {
+                    if (human.getDefence() == true)
+                    {
                         //Charged attack against a defended human player
-                        Debug.Log("You have succesfully thwarthed a powerful enemy attack");
-                        charged = false;
-                        defendedHuman = false;
+                        human.attacked(-2);
+                        ai.charged(false);
+                        human.defend(false);
                         isPlayerTurn = true;
+                        Debug.Log("Blocked charged enemy attack, but it dealt 2 damage, Your Health: " + human.getHealthPoints() + " " + "Opponent's Health: " + ai.getHealthPoints());
                     }
 
-                    else{
+                    else
+                    {
                         //Charged attack against an undefended human player
                         int playerDamage = human.getHealthPoints();
-                        human.setHealthPoints(-playerDamage);
-                        Debug.Log("Opponent has dealt you "+ playerDamage + " Damage, " +"Your Health: "+ human.getHealthPoints() + " " + "Opponent's Health: " + ai.getHealthPoints());
-                        charged = false;
+                        human.attacked(-playerDamage);
+                        ai.charged(false);
                         isPlayerTurn = true;
+                        Debug.Log("Charged enemy attack costs you " + playerDamage + " Damage, " + "Your Health: " + human.getHealthPoints() + " " + "Opponent's Health: " + ai.getHealthPoints());
                     }
 
                 }
 
-                else if(action > 35){
+                else if (action >= 51)
+                {
                     //Attacking human player
                     //Normal attack against a defended human
-                        if(defendedHuman){
-                            Debug.Log("You have succesfully thwarthed an enemy attack");
-                            defendedHuman = false;
-                            isPlayerTurn = true;
-                        }
+                    if (human.getDefence() == true)
+                    {
+                        human.defend(false);
+                        isPlayerTurn = true;
+                        Debug.Log("You have succesfully thwarthed an enemy attack");
+                    }
 
                     //Normal attack against an undefended human
-                        else{
-                            int playerDamage = Random.Range(2, 5);
-                            human.setHealthPoints(-playerDamage);
-                            Debug.Log("Opponent has dealt you "+ playerDamage + " Damage, " + "Your Health: "+ human.getHealthPoints() + " " + "Opponent's Health: " + ai.getHealthPoints());
+                    else
+                    {
+                        int playerDamage;
+                        if (ai.getHealthPoints() <= 5)
+                        {
+                            playerDamage = Random.Range(3, 5); // AI attacks with the most powerful blows if its health is less than half
+                            human.attacked(-playerDamage);
+                            Debug.Log("Opponent has dealt you " + playerDamage + " Damage, " + "Your Health: " + human.getHealthPoints() + " " + "Opponent's Health: " + ai.getHealthPoints());
                             isPlayerTurn = true;
                         }
+
+                        else
+                        {
+                            playerDamage = Random.Range(2, 5);
+                            human.attacked(-playerDamage);
+                            Debug.Log("Opponent has dealt you " + playerDamage + " Damage, " + "Your Health: " + human.getHealthPoints() + " " + "Opponent's Health: " + ai.getHealthPoints());
+                            isPlayerTurn = true;
+                        }
+                    }
                 }
 
-                else if(action <= 35){
+                else if (action >= 21 && action <= 50)
+                {
+                    //Enemy is healing
+                    if (ai.getHealthPoints() == 10)
+                    {
+                        Debug.Log("Enemy is at maximum health, Your Health: " + human.getHealthPoints() + " " + "Opponent's Health: " + ai.getHealthPoints());
+                        isPlayerTurn = true;
+                    }
+
+                    else if (human.getHealthPoints() == 9)
+                    {
+                        ai.setHealthPoints(1);
+                        Debug.Log("Enemy is at maximum health, Your Health: " + human.getHealthPoints() + " " + "Opponent's Health: " + ai.getHealthPoints());
+                        isPlayerTurn = true;
+                    }
+
+                    else if (human.getHealthPoints() <= 8)
+                    {
+                        ai.setHealthPoints(2);
+                        Debug.Log("Enemy healed by 2 Health Points, Your Health: " + human.getHealthPoints() + " " + "Opponent's Health: " + ai.getHealthPoints());
+                        isPlayerTurn = true;
+                    }
+                }
+
+                else if (action <= 20)
+                {
                     //Enemy is charging
                     Debug.Log("Warning: Opponent is charging");
-                    charged = true;
+                    ai.charged(true);
                     isPlayerTurn = true;
                 }
+
             }
 
         }
 
-        else if(human.getHealthPoints() <= 0 || ai.getHealthPoints() <= 0){
-            if(human.getHealthPoints() <= 0){
-                Debug.Log("Opponent won XC, Game Over! Press 1 to restart");
-                
-                if(Input.GetKeyDown(KeyCode.Keypad1)){
-                    Start();
-                }
-
+        else if (human.getHealthPoints() <= 0 || ai.getHealthPoints() <= 0)
+        {
+            if (human.getHealthPoints() <= 0)
+            {
+                if (outPlay) opponentWonDialogue();
+                outPlay = false;
             }
 
-            if(ai.getHealthPoints() <= 0){
-                Debug.Log("Congratulations, you won! Press 1 to restart");
-                
-                if(Input.GetKeyDown(KeyCode.Keypad1)){
-                    Start();
-                }
+            else if (ai.getHealthPoints() <= 0)
+            {
+                if (outPlay) playerwonDialogue();
+                outPlay = false;
             }
         }
-        
-    }
+
+        }
+
+        //Player has won dialogue
+        void playerwonDialogue()
+        {
+            Debug.Log("Congratulations, you won! Press 1 to restart");
+            if (!isRoutine) StartCoroutine(reloading());
+        }
+
+        //Opponent has won dialogue
+        void opponentWonDialogue()
+        {
+            Debug.Log("Opponent won XC, Game Over! Press 1 to restart");
+            if (!isRoutine) StartCoroutine(reloading());
+        }
+
+        //restart
+        IEnumerator reloading()
+        {
+            isRoutine = true;
+
+            while (true)
+            {
+                if (Input.GetKeyDown(KeyCode.Keypad1)) SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                yield return null;
+            }
+        }
+    
 }
