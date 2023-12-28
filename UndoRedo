@@ -1,0 +1,180 @@
+# global text document
+var textdoc = "";
+
+# do not change this class
+class Action
+{
+public:
+	function exec()
+	{
+		# override in subclasses
+	}
+	function undo()
+	{
+		# override in subclasses
+	}
+}
+
+# do not change this class
+class History
+{
+public:
+	function exec(action)
+	{
+		if not Type.isOfType(action, Action) then throw "History.exec: invalid parameter type";
+		actions = actions[0:current];
+		action.exec();
+		actions.push(action);
+		current += 1;
+	}
+	function undo()
+	{
+		if current == 0 then throw "no action to undo";
+		current -= 1;
+		actions[current].undo();
+	}
+	function redo()
+	{
+		if current == actions.size() then throw "no action to redo";
+		actions[current].exec();
+		current += 1;
+	}
+
+private:
+	var actions = [];   # list of actions, which can be undone
+	var current = 0;    # actions[0:current] are done, the remaining ones are undone
+}
+
+
+class InsertAction: Action
+{
+	private:
+	var m_pos;
+	var m_s;
+	var m_bef;
+	
+	public:
+	constructor(pos, s)
+	{
+		m_pos = pos;
+		m_s = s;
+		
+		if(textdoc.size() > 0) then
+		{
+			m_bef = textdoc[pos];
+		}
+		else
+		{
+			m_bef = "";
+		}
+	}
+	
+	function exec()
+	{
+		if(textdoc.size() > 0) then 
+		{
+			textdoc[m_pos] = m_s;
+		}
+		else
+		{
+			textdoc = m_s;
+		}
+	}
+	function undo()
+	{
+		if(m_bef.size() > 0) then 
+		{
+		textdoc[m_pos] = m_bef;
+		}
+		else
+		{
+			textdoc = "";
+		}
+	}
+}
+
+
+class DeleteAction: Action
+{
+	private:
+	var m_pos;
+	var m_len;
+	var m_bef = [];
+	
+	public:
+	constructor(pos, len)
+	{
+		m_pos = pos;
+		m_len = len;
+		
+		for var i in (m_pos:m_pos + m_len) do
+		{
+			m_bef.push(textdoc[i]);
+		}
+	}
+	
+	function exec()
+	{
+		for var i in (m_pos:m_pos + m_len) do
+		{
+			textdoc[i] = 32;
+		}
+	}
+	function undo()
+	{
+		for var i in (m_pos:m_pos + m_len) do
+		{
+			textdoc[i] = m_bef[i];
+		}
+	}
+}
+
+
+class OverwriteAction: Action
+{
+	private:
+	var m_pos;
+	var m_s;
+	var m_bef = [];
+	
+	public:
+	constructor(pos, s)
+	{
+		m_pos = pos;
+		m_s = s;
+		
+		for var i in (m_pos:m_pos + s.size()) do
+		{
+			m_bef.push(textdoc[i]);
+		}
+	}
+	
+	function exec()
+	{
+		var j = 0;
+		
+		for var i in (m_pos:m_pos + m_s.size()) do
+		{
+			textdoc[i] = m_s[j];
+			j += 1;
+		}
+	}
+	
+	function undo()
+	{
+		var j = 0;
+		
+		for var i in (m_pos:m_pos + m_s.size()) do
+		{
+			textdoc[i] = m_bef[j];
+			j += 1;
+		}
+	}
+}
+
+
+var history = History();
+history.exec(InsertAction(0, "Hello, World"));
+print(textdoc);                                   # "Hello, World"
+history.exec(InsertAction(11, "sadas"));
+print(textdoc); 
