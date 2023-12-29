@@ -46,6 +46,48 @@ private:
 }
 
 
+function insert(input, pos, str){
+    var result = "";
+    
+    for var i in (0: input.size()) do{
+        if(i == pos) then {
+            result += str;
+        }
+        result += String.fromUnicode(input[i]);
+    }
+    return result;
+}
+
+function delete(input, pos, len){
+    var result = "";
+    
+    for var i in (0 : input.size()) do{
+        if(i >= pos and i < (pos + len)) then{
+            continue;
+        }
+        result += String.fromUnicode(input[i]);
+    }
+    return result;
+}
+
+function overwrite(input, pos, s){
+    var result = "";
+    
+    for var i in (0: input.size()) do{
+        if(i == pos) then {
+            result += s;           
+            continue;
+        }
+        if( i > pos and i < pos + s.size()) then {
+            continue;
+        }
+        result += String.fromUnicode(input[i]);
+    }
+    return result;
+}
+
+
+
 class InsertAction: Action
 {
 	private:
@@ -61,7 +103,7 @@ class InsertAction: Action
 		
 		if(textdoc.size() > 0) then
 		{
-			m_bef = textdoc[pos];
+			m_bef = textdoc;
 		}
 		else
 		{
@@ -73,7 +115,7 @@ class InsertAction: Action
 	{
 		if(textdoc.size() > 0) then 
 		{
-			textdoc[m_pos] = m_s;
+			textdoc = insert(textdoc, m_pos, m_s);
 		}
 		else
 		{
@@ -82,14 +124,7 @@ class InsertAction: Action
 	}
 	function undo()
 	{
-		if(m_bef.size() > 0) then 
-		{
-		textdoc[m_pos] = m_bef;
-		}
-		else
-		{
-			textdoc = "";
-		}
+		textdoc = m_bef;
 	}
 }
 
@@ -107,25 +142,24 @@ class DeleteAction: Action
 		m_pos = pos;
 		m_len = len;
 		
-		for var i in (m_pos:m_pos + m_len) do
+		if(textdoc.size() > 0) then
 		{
-			m_bef.push(textdoc[i]);
+			m_bef = textdoc;
 		}
+		else
+		{
+			m_bef = "";
+		}
+		
 	}
 	
 	function exec()
 	{
-		for var i in (m_pos:m_pos + m_len) do
-		{
-			textdoc[i] = 32;
-		}
+		textdoc = delete(textdoc, m_pos, m_len);
 	}
 	function undo()
 	{
-		for var i in (m_pos:m_pos + m_len) do
-		{
-			textdoc[i] = m_bef[i];
-		}
+		textdoc = m_bef;
 	}
 }
 
@@ -143,32 +177,24 @@ class OverwriteAction: Action
 		m_pos = pos;
 		m_s = s;
 		
-		for var i in (m_pos:m_pos + s.size()) do
+		if(textdoc.size() > 0) then
 		{
-			m_bef.push(textdoc[i]);
+			m_bef = textdoc;
+		}
+		else
+		{
+			m_bef = "";
 		}
 	}
 	
 	function exec()
 	{
-		var j = 0;
-		
-		for var i in (m_pos:m_pos + m_s.size()) do
-		{
-			textdoc[i] = m_s[j];
-			j += 1;
-		}
+		textdoc = overwrite(textdoc, m_pos, m_s);
 	}
 	
 	function undo()
 	{
-		var j = 0;
-		
-		for var i in (m_pos:m_pos + m_s.size()) do
-		{
-			textdoc[i] = m_bef[j];
-			j += 1;
-		}
+		textdoc = m_bef;
 	}
 }
 
@@ -176,5 +202,20 @@ class OverwriteAction: Action
 var history = History();
 history.exec(InsertAction(0, "Hello, World"));
 print(textdoc);                                   # "Hello, World"
-history.exec(InsertAction(11, "sadas"));
-print(textdoc); 
+history.exec(DeleteAction(5, 1));
+print(textdoc);                                   # "Hello World"
+history.undo();
+print(textdoc);                                   # "Hello, World"
+history.exec(OverwriteAction(1, "a"));
+history.exec(OverwriteAction(8, "elt!"));
+print(textdoc);                                   # "Hallo, Welt!"
+history.undo();
+history.undo();
+print(textdoc);                                   # "Hello, World"
+history.undo();
+print(textdoc);                                   # ""
+history.redo();
+print(textdoc);                                   # "Hello, World"
+history.redo();
+history.redo();
+print(textdoc);                                   # "Hallo, Welt!"
